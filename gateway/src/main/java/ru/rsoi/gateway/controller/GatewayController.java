@@ -26,7 +26,7 @@ public class GatewayController {
 
     private static final Logger log = LoggerFactory.getLogger(GatewayController.class);
 
-    private static final String RATING_UNAVAILABLE = "Rating Service unavailable";
+    private static final String RATING_UNAVAILABLE = "Bonus Service unavailable";
     private static final String LIBRARY_UNAVAILABLE = "Library Service unavailable";
     private static final String RESERVATION_UNAVAILABLE = "Reservation Service unavailable";
 
@@ -151,7 +151,7 @@ public class GatewayController {
     public ResponseEntity<?> takeBook(@RequestHeader("X-User-Name") String username,
                                       @RequestBody TakeBookRequest req) {
 
-        // 1) Rating — КРИТИЧНЫЙ источник для этой операции.
+        // 1) Rating — источник для этой операции.
         Map<String, Object> rating;
         try {
             rating = ratingClient.getRating(username);
