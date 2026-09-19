@@ -1,6 +1,7 @@
 package ru.rsoi.gateway.controller;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+//import io.github.resilience4j.circuitbreaker.CircuitBreakerOpenException;
+import ru.rsoi.gateway.cb.CircuitBreakerOpenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import ru.rsoi.gateway.exception.ServiceUnavailableException;
 import ru.rsoi.gateway.queue.RatingUpdateQueue;
 import ru.rsoi.gateway.queue.RatingUpdateTask;
 
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -24,7 +26,7 @@ public class GatewayController {
 
     private static final Logger log = LoggerFactory.getLogger(GatewayController.class);
 
-    private static final String RATING_UNAVAILABLE = "Bonus Service unavailable";
+    private static final String RATING_UNAVAILABLE = "Rating Service unavailable";
     private static final String LIBRARY_UNAVAILABLE = "Library Service unavailable";
     private static final String RESERVATION_UNAVAILABLE = "Reservation Service unavailable";
 
@@ -52,7 +54,8 @@ public class GatewayController {
                                             @RequestParam(value = "size", defaultValue = "10") int size) {
         try {
             return ResponseEntity.ok(libraryClient.getLibraries(city, page, size));
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        }
+        catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             log.warn("Circuit breaker OPEN for libraryClient: {}", e.getMessage());
             throw new ServiceUnavailableException(LIBRARY_UNAVAILABLE);
         } catch (Exception e) {
@@ -71,7 +74,7 @@ public class GatewayController {
                                         @RequestParam(value = "showAll", defaultValue = "false") boolean showAll) {
         try {
             return ResponseEntity.ok(libraryClient.getBooks(libraryUid, page, size, showAll));
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        } catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             log.warn("Circuit breaker OPEN for libraryClient: {}", e.getMessage());
             throw new ServiceUnavailableException(LIBRARY_UNAVAILABLE);
         } catch (Exception e) {
@@ -87,7 +90,7 @@ public class GatewayController {
     public ResponseEntity<Object> rating(@RequestHeader("X-User-Name") String username) {
         try {
             return ResponseEntity.ok(ratingClient.getRating(username));
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        } catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             log.warn("Circuit breaker OPEN for ratingClient: {}", e.getMessage());
             throw new ServiceUnavailableException(RATING_UNAVAILABLE);
         } catch (Exception e) {
@@ -104,7 +107,7 @@ public class GatewayController {
         List<Map<String, Object>> rows;
         try {
             rows = reservationClient.list(username);
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        } catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             log.warn("Circuit breaker OPEN for reservationClient: {}", e.getMessage());
             throw new ServiceUnavailableException(RESERVATION_UNAVAILABLE);
         } catch (Exception e) {
@@ -152,7 +155,7 @@ public class GatewayController {
         Map<String, Object> rating;
         try {
             rating = ratingClient.getRating(username);
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        } catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             log.warn("Circuit breaker OPEN for ratingClient: {}", e.getMessage());
             throw new ServiceUnavailableException(RATING_UNAVAILABLE);
         } catch (Exception e) {
@@ -166,7 +169,7 @@ public class GatewayController {
         try {
             Long active = reservationClient.countActive(username);
             rented = active == null ? 0 : active;
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        } catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             log.warn("Circuit breaker OPEN for reservationClient: {}", e.getMessage());
             throw new ServiceUnavailableException(RESERVATION_UNAVAILABLE);
         } catch (Exception e) {
@@ -242,7 +245,7 @@ public class GatewayController {
         List<Map<String, Object>> rows;
         try {
             rows = reservationClient.list(username);
-        } catch (CallNotPermittedException | ServiceUnavailableException e) {
+        } catch (CircuitBreakerOpenException | ServiceUnavailableException e) {
             throw new ServiceUnavailableException(RESERVATION_UNAVAILABLE);
         } catch (Exception e) {
             throw new ServiceUnavailableException(RESERVATION_UNAVAILABLE);

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
+import ru.rsoi.gateway.cb.CircuitBreakerOpenException;
 
 import java.util.Map;
 
@@ -16,10 +17,17 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ServiceUnavailableException.class)
-    public ResponseEntity<Map<String, String>> handleServiceUnavailable(ServiceUnavailableException e) {
+    public ResponseEntity<Map<String, String>> handleUnavailable(ServiceUnavailableException e) {
         log.warn("Service unavailable: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Map.of("message", e.getMessage()));
+    }
+
+    @ExceptionHandler(CircuitBreakerOpenException.class)
+    public ResponseEntity<Map<String, String>> handleCbOpen(CircuitBreakerOpenException e) {
+        log.warn("Circuit breaker is open: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of("message", "Service temporarily unavailable"));
     }
 
     @ExceptionHandler(ResourceAccessException.class)

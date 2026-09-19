@@ -1,7 +1,7 @@
 {
   "_": {
     "postman_variable_scope": "environment",
-    "postman_exported_at": "2026-09-19T04:02:02.932Z",
+    "postman_exported_at": "2026-09-19T04:02:41.458Z",
     "postman_exported_using": "Newman/6.2.2"
   },
   "id": "f30432e5-4321-4516-8c53-4e2d4f7abf94",
@@ -39,6 +39,6 @@
     }
   ],
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2026-09-19T04:02:41.458Z",
+  "_postman_exported_at": "2026-09-19T08:23:20.203Z",
   "_postman_exported_using": "Newman/6.2.2"
 }
